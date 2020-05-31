@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="lib/bootstrap.css">
+    <link rel="stylesheet" href="lib/datatables.min.css">
+    <title>Datatables</title>
+</head>
+<body>
+    <!-- Modal -->
+<div class="modal fade" id="editar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Editar laboratorio</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="form-editar">
+              <div class="form-group">
+                  <label for="">Laboratorio: </label>
+                  <input type="text" id="nombre_laboratorio" class="form-control">
+                  <input type="hidden" id="id">
+              </div>
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="eliminar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">eliminar laboratorio</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="form-eliminar">
+              <div class="form-group">
+                  <label for="">Laboratorio: </label>
+                  <label id="laboratorio_eliminar"></label>
+                  <input type="hidden" id="id_laboratorio">
+              </div>
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+              <h1 class="display-4">DATATABLE</h1>
+              <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+            </div>
+        </div>
+        <table id="example"class="display table table-hover text-nowrap">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/bootstrap.js"></script>
+    <script src="lib/datatables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var funcion='listar';
+    let datatable = $('#example').DataTable({
+        "ajax": {
+            "url": "controlador/LaboratorioController.php",
+            "method": "POST",
+            "data":{funcion:funcion}
+        },
+        "columns": [
+            { "data": "id" },
+            { "data": "nombre" },
+            { "defaultContent": `<button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#editar">Editar</button>
+                                <button class="eliminar btn btn-danger"type="button" data-toggle="modal" data-target="#eliminar">Eliminar</button>` }
+        ],
+        "language": espanol
+    });
+    $('#example tbody').on('click','.editar', function(){
+      let data = datatable.row($(this).parents()).data();
+      $('#nombre_laboratorio').val(data.nombre);
+      $('#id').val(data.id);
+    })
+    $('#form-editar').submit(e=>{
+      let id =$('#id').val();
+      let nombre=$('#nombre_laboratorio').val();
+      funcion='editar';
+      $.post('controlador/LaboratorioController.php',{id,nombre,funcion},(response)=>{
+        
+      })
+      
+    })
+    $('#example tbody').on('click','.eliminar', function(){
+      let data = datatable.row($(this).parents()).data();
+      $('#laboratorio_eliminar').html(data.nombre);
+      $('#id_laboratorio').val(data.id);
+    })
+    $('#form-eliminar').submit(e=>{
+      let id =$('#id_laboratorio').val();
+      funcion='eliminar';
+      $.post('controlador/LaboratorioController.php',{id,funcion},(response)=>{
+        
+      })
+      
+    })
+} );
+let espanol = {
+    "sProcessing":     "Procesando...",
+    "sLengthMenu":     "Mostrar _MENU_ registros",
+    "sZeroRecords":    "No se encontraron resultados",
+    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+    "sInfoPostFix":    "",
+    "sSearch":         "Buscar:",
+    "sUrl":            "",
+    "sInfoThousands":  ",",
+    "sLoadingRecords": "Cargando...",
+    "oPaginate": {
+        "sFirst":    "Primero",
+        "sLast":     "Último",
+        "sNext":     "Siguiente",
+        "sPrevious": "Anterior"
+    },
+    "oAria": {
+        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+    },
+    "buttons": {
+        "copy": "Copiar",
+        "colvis": "Visibilidad"
+    }
+};
+    </script>
+</body>
+</html>
